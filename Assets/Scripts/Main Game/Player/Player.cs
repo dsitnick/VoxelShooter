@@ -3,16 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-namespace Game {
+namespace Match {
 
     //The main monobehaviour for each player.
     //This is responsible for all calls to and from the networkmanager, as well as communicating with all components
     public class Player : NetworkBehaviour {
 
-        private PlayerMovement movement;
+        private Movement movement;
+        private WeaponManager weaponManager;
 
         void Awake () {
-            movement = GetComponent<PlayerMovement> ();
+            movement = GetComponent<Movement> ();
+            weaponManager = GetComponent<WeaponManager> ();
         }
 
         #region Primary Methods
@@ -20,19 +22,23 @@ namespace Game {
         //Called OnStartClient
         public void Initialize () {
             movement.Initialize ();
+            weaponManager.Initialize ();
         }
 
         //Called RpcSetup
         public void Setup (int index) {
             movement.Setup (index);
+            weaponManager.Setup (index);
         }
 
         public void Spawn () {
             movement.Spawn ();
+            weaponManager.Spawn ();
         }
 
         public void Die () {
             movement.Die ();
+            weaponManager.Die ();
         }
 
         #endregion
