@@ -12,6 +12,8 @@ namespace Match {
         private Movement movement;
         private WeaponManager weaponManager;
 
+		public Camera mainCamera;
+
         void Awake () {
             movement = GetComponent<Movement> ();
             weaponManager = GetComponent<WeaponManager> ();
@@ -21,13 +23,13 @@ namespace Match {
 
         //Called OnStartClient
         public void Initialize () {
-            movement.Initialize ();
+            movement.Initialize (InputManager.DEFAULT_CONTROLLER, mainCamera);
             weaponManager.Initialize ();
         }
 
         //Called RpcSetup
         public void Setup (int index) {
-            movement.Setup (index);
+			movement.Setup (GameData.Character.Default);
             weaponManager.Setup (index);
         }
 
