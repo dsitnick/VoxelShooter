@@ -41,7 +41,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4500853015403548}
   - component: {fileID: 33498824555232006}
-  - component: {fileID: 136402216532610038}
   - component: {fileID: 23749841840417790}
   m_Layer: 0
   m_Name: Capsule
@@ -303,16 +302,3 @@ Behaviour:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1745320125219070}
   m_Enabled: 1
---- !u!136 &136402216532610038
-CapsuleCollider:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1627486044919558}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}

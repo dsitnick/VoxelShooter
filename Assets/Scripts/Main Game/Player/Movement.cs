@@ -14,6 +14,8 @@ namespace Match {
 		private Controller controller;
 		private Camera mainCamera;
 
+        private int mask;
+
 		//TEMPORARY
 		public float sensitivity;
 
@@ -21,6 +23,7 @@ namespace Match {
 
 		void Awake(){
 			rb = GetComponent<Rigidbody> ();
+            mask = 1 << LayerMask.NameToLayer ("Map");
 			Setup (Character.Default); //TEMPORARY
 		}
 
@@ -65,6 +68,18 @@ namespace Match {
 		void Jump(){
 			
 		}
+
+        private const float checkDistance = 0.2f;
+        bool Grounded (out float y) {
+            float d = Mathf.Max (checkDistance, rb.velocity.y * Time.fixedDeltaTime);
+            RaycastHit h;
+            if (Physics.BoxCast(rb.position + 0.5f, )) {
+                y = h.point.y;
+                return true; 
+            }
+            y = 0;
+            return false;
+        }
     }
 }
 
