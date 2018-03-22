@@ -13,17 +13,19 @@ namespace Match {
         private WeaponManager weaponManager;
 
 		public Camera mainCamera;
+        public Transform modelRoot; //Change to model manager in future
+        public BoxCollider box;
 
         void Awake () {
-            movement = GetComponent<Movement> ();
-            weaponManager = GetComponent<WeaponManager> ();
+            movement = gameObject.AddComponent<Movement> ();
+            weaponManager = gameObject.AddComponent<WeaponManager> ();
         }
 
         #region Primary Methods
 
         //Called OnStartClient
         public void Initialize () {
-            movement.Initialize (InputManager.DEFAULT_CONTROLLER, mainCamera);
+            movement.Initialize (InputManager.DEFAULT_CONTROLLER, mainCamera, modelRoot, box);
             weaponManager.Initialize ();
         }
 

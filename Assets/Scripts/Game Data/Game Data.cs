@@ -34,7 +34,7 @@ namespace GameData {
             for (int i = 0; i < WEAPON_COUNT; i++) { this.weapons[i] = weapons[i]; }
         }
 
-        public static Character Default = new Character (100, 100, 20, 1.5f, 50, 2, -1, -1, -1, -1, new int[] { -1, -1, -1, -1 });
+        public static Character Default = new Character (100, 100, 20, 1.5f, 8, 6, -1, -1, -1, -1, new int[] { -1, -1, -1, -1 });
 
         /*public Character (Character other) {
             healthMax = other.healthMax;
