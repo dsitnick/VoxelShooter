@@ -11,11 +11,13 @@ namespace Match {
     public class Movement : MonoBehaviour {
 
 		private Rigidbody rb;
-        private float speed, jumpHeight;
 		private Controller controller;
 		private Camera mainCamera;
         private Transform modelRoot;
         private BoxCollider box;
+
+		private float speed, jumpHeight;
+		private bool active = false;
 
         int mask;
 
@@ -35,6 +37,7 @@ namespace Match {
 			this.mainCamera = mainCamera;
             this.modelRoot = modelRoot;
             this.box = box;
+			active = false;
         }
 
         public void Setup (Character character) {
@@ -42,64 +45,80 @@ namespace Match {
 			jumpHeight = character.jumpHeight;
         }
 
-        public void Spawn () {
-
+		public void Spawn (Vector3 position, float rotation) {
+			SetPosition (position);
+			modelRoot.eulerAngles = Vector3.up * rotation;
+			active = true;
         }
 
         public void Die () {
-
+			active = false;
         }
 
 		#endregion
         
+		private const float GRAVITY = 8f, AIR_DRIFT = 0.1f;
 
-		float y = 0;
-
-
-        private long lastMilli;
-        float grav;
-        private Vector3 velocity, direction;
-        private const float GRAVITY = 8f;
-        public bool ground;
+		private float aimY = 0; //y angle of players aim
+		private Vector3 direction; //Worldspace direction of suggested character movement, set on Update
         void Update(){
+			if (!active) 
+				return;
+
+			//Jump Polling
 			if (ground && controller.Jump ()) {
 				Jump ();
 			}
 
-            //Camera movement
-			y = Mathf.Clamp (y - controller.AimY() * sensitivity, -90, 90);
-			mainCamera.transform.localEulerAngles = Vector3.right * y;
+            //Camera controlling, body rotating
+			aimY = Mathf.Clamp (aimY - controller.AimY() * sensitivity, -90, 90);
+			mainCamera.transform.localEulerAngles = Vector3.right * aimY;
 			modelRoot.eulerAngles += Vector3.up * controller.AimX () * sensitivity;
 
-            //Model movement
-            long millis = Millis () - lastMilli;
-            direction = (modelRoot.right * controller.MoveX () + modelRoot.forward * controller.MoveY ());
-            float y2 = grav - GRAVITY * (millis / 1000f);
-            modelRoot.position = rb.position + (velocity + Vector3.down * y2 * (millis / 1000f)) * (millis / 1000f);
+            //Movement controlling
+			direction = modelRoot.right * controller.MoveX () + modelRoot.forward * controller.MoveY ();
+
+			//Smooth Model movement
+			float delta = (Millis () - lastTime) / 1000f;
+			float modelGrav = ground ? 0 : GRAVITY * delta;
+            Vector3 pos = rb.position + (rb.velocity - Vector3.up * modelGrav) * delta;
+			modelRoot.position = pos;
         }
-
+			
+		private float fallSpeed; //Authoritative over rigidbody's y velocity
+		public bool ground; //Running boolean for grounded since last check, set on FixedUpdate
         void FixedUpdate () {
-            Vector3 v = direction * speed;
-            v.y = grav;
-            rb.position += v * Time.fixedDeltaTime;
-            rb.velocity = Vector3.zero;
+			if (!active)
+				return;
 
-            float y;
-            if (v.y <= 0 && grounded (rb.transform, out y)) {
+			//Updates velocity
+			Vector3 velocity;
+			if (ground) {
+				velocity = direction * speed;
+			}else{
+				velocity = Vector3.Lerp (rb.velocity, direction * speed, AIR_DRIFT);
+			}
+
+			//Performing ground check
+            float hitY;
+            if (fallSpeed <= 0 && grounded (rb.transform, out hitY)) {
+				//If grounded, position player at ground hit position, null the y velocity
                 ground = true;
-                rb.transform.position = new Vector3(rb.transform.position.x, y, rb.transform.position.z);
-                grav = 0;
+                rb.transform.position = new Vector3(rb.transform.position.x, hitY, rb.transform.position.z);
+                fallSpeed = 0;
             } else {
+				//If airborne, decrease fall speed by gravity
                 ground = false;
-                grav -= GRAVITY * Time.fixedDeltaTime;
+                fallSpeed -= GRAVITY * Time.fixedDeltaTime;
             }
-            lastMilli = Millis ();
-            velocity = v;
-            velocity.y = grav;
+			velocity.y = fallSpeed;
+			rb.velocity = velocity;
+
+			lastTime = Millis ();
         }
 
 		void Jump(){
-            grav = jumpHeight;
+            fallSpeed = jumpHeight;
 		}
 
         private const float groundDistance = 0.2f;
@@ -124,6 +143,11 @@ namespace Match {
             return result;
         }
 
+		private void SetPosition(Vector3 position){
+			modelRoot.position = rb.position = position;
+		}
+
+		private long lastTime;
         private static long Millis () { return DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond; }
     }
 }

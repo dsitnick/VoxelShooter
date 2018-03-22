@@ -34,13 +34,13 @@ namespace Match {
 			movement.Setup (GameData.Character.Default);
             weaponManager.Setup (index);
         }
-
-        public void Spawn () {
-            movement.Spawn ();
+			
+		private void Spawn (Vector3 position, float rotation) {
+            movement.Spawn (position, rotation);
             weaponManager.Spawn ();
         }
 
-        public void Die () {
+        private void Die () {
             movement.Die ();
             weaponManager.Die ();
         }
@@ -52,7 +52,21 @@ namespace Match {
         public override void OnStartClient () {
             base.OnStartClient ();
             Initialize ();
+
+			//TEMPORARY
+			Setup (0);
+			Spawn (Vector3.up * 5, 0);
         }
+
+		[ClientRpc]
+		public void RpcSpawn (Vector3 position, float rotation) {
+			Spawn (position, rotation);
+		}
+
+		[ClientRpc]
+		public void RpcDie () {
+			Die ();
+		}
 
         [ClientRpc]
         public void RpcSetup(int index) {
@@ -64,6 +78,11 @@ namespace Match {
         public void CmdSetup(int index) {
             RpcSetup (index);
         }
+
+		[Command]
+		public void CmdDamage(float amount){
+			HealthManager.TakeDamage (playerControllerId, amount);
+		}
 
         #endregion
     }
