@@ -19,11 +19,15 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4568526297480080}
-  - component: {fileID: 54489570338198900}
+  - component: {fileID: 114631552872771810}
   - component: {fileID: 114005609445732574}
-  - component: {fileID: 114825951420387276}
-  - component: {fileID: 114459086897031312}
+  - component: {fileID: 114937752616666832}
+  - component: {fileID: 114377593431928592}
+  - component: {fileID: 114961407126680532}
+  - component: {fileID: 54489570338198900}
   - component: {fileID: 65460938676486474}
+  - component: {fileID: 114826315662878876}
+  - component: {fileID: 95718126264627514}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -73,7 +77,6 @@ GameObject:
   - component: {fileID: 4911341434405692}
   - component: {fileID: 20972551985096278}
   - component: {fileID: 124654778272931446}
-  - component: {fileID: 81809656390733094}
   m_Layer: 0
   m_Name: Camera
   m_TagString: Untagged
@@ -240,13 +243,23 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 2, z: 1}
   m_Center: {x: 0, y: 1, z: 0}
---- !u!81 &81809656390733094
-AudioListener:
+--- !u!95 &95718126264627514
+Animator:
+  serializedVersion: 3
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1745320125219070}
+  m_GameObject: {fileID: 1229330953179370}
   m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 8d7f29953abfe4ba787bca9f11e2408f, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
 --- !u!114 &114005609445732574
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -279,7 +292,7 @@ MonoBehaviour:
     i15: 50
   m_ServerOnly: 0
   m_LocalPlayerAuthority: 1
---- !u!114 &114459086897031312
+--- !u!114 &114377593431928592
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -287,13 +300,57 @@ MonoBehaviour:
   m_GameObject: {fileID: 1229330953179370}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 718e310752bbf7d48b6da97787bce90f, type: 3}
+  m_Script: {fileID: 11500000, guid: 1b3804831a1df6a438c0f5c914c67a56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &114631552872771810
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1229330953179370}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 27c019ba136804aa1ba5f6ef0d1f8e5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Character: 0
+  Health: 0
   mainCamera: {fileID: 20972551985096278}
   modelRoot: {fileID: 4773333561683444}
   box: {fileID: 65460938676486474}
---- !u!114 &114825951420387276
+--- !u!114 &114826315662878876
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1229330953179370}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1590678366, guid: dc443db3e92b4983b9738c1131f555cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Animator: {fileID: 95718126264627514}
+  m_ParameterSendBits: 0
+  param0: 
+  param1: 
+  param2: 
+  param3: 
+  param4: 
+  param5: 
+--- !u!114 &114937752616666832
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1229330953179370}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa6faacfc4c488f409d8aa87300e229e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ground: 0
+--- !u!114 &114961407126680532
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -305,8 +362,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TransformSyncMode: 3
-  m_SendInterval: 0.1
-  m_SyncRotationAxis: 7
+  m_SendInterval: 0.033333335
+  m_SyncRotationAxis: 2
   m_RotationSyncCompression: 0
   m_SyncSpin: 0
   m_MovementTheshold: 0.001

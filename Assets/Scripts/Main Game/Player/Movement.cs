@@ -5,10 +5,10 @@ using UnityEngine.Networking;
 using GameData;
 using System;
 
-namespace Match {
+namespace Players {
 
     //Handles all motion, physics, knockback, etc
-    public class Movement : MonoBehaviour {
+    public class Movement : NetworkBehaviour {
 
 		private Rigidbody rb;
 		private Controller controller;
@@ -59,7 +59,7 @@ namespace Match {
         
 		private const float GRAVITY = 8f, AIR_DRIFT = 0.1f;
 
-		private float aimY = 0; //y angle of players aim
+		private float aimX = 0, aimY = 0; //y angle of players aim
 		private Vector3 direction; //Worldspace direction of suggested character movement, set on Update
         void Update(){
 			if (!active) 
@@ -71,24 +71,32 @@ namespace Match {
 			}
 
             //Camera controlling, body rotating
-			aimY = Mathf.Clamp (aimY - controller.AimY() * sensitivity, -90, 90);
+			if (isLocalPlayer){
+				aimX += controller.AimX () * sensitivity;
+				aimY = Mathf.Clamp (aimY - controller.AimY() * sensitivity, -90, 90);
+			}
+
 			mainCamera.transform.localEulerAngles = Vector3.right * aimY;
-			modelRoot.eulerAngles += Vector3.up * controller.AimX () * sensitivity;
+			modelRoot.eulerAngles = Vector3.up * aimX;
 
             //Movement controlling
-			direction = modelRoot.right * controller.MoveX () + modelRoot.forward * controller.MoveY ();
-
+			if (isLocalPlayer) 
+				direction = modelRoot.right * controller.MoveX () + modelRoot.forward * controller.MoveY ();
+			
 			//Smooth Model movement
 			float delta = (Millis () - lastTime) / 1000f;
 			float modelGrav = ground ? 0 : GRAVITY * delta;
             Vector3 pos = rb.position + (rb.velocity - Vector3.up * modelGrav) * delta;
 			modelRoot.position = pos;
         }
-			
+
 		private float fallSpeed; //Authoritative over rigidbody's y velocity
-		public bool ground; //Running boolean for grounded since last check, set on FixedUpdate
+		public bool ground;
+
         void FixedUpdate () {
-			if (!active)
+			lastTime = Millis ();
+
+			if (!active || !isLocalPlayer)
 				return;
 
 			//Updates velocity
@@ -113,8 +121,6 @@ namespace Match {
             }
 			velocity.y = fallSpeed;
 			rb.velocity = velocity;
-
-			lastTime = Millis ();
         }
 
 		void Jump(){

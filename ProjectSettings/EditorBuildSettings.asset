@@ -8,6 +8,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Match.unity
     guid: bf036749fe6784c498846704c072f2fa
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Lobby.unity
     guid: e4811838c21ee40c88881995899016de
+  - enabled: 0
+    path: Assets/test.unity
+    guid: 4425ece6d28884618a598dc559b80a61

@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using Match;
 
-namespace Match {
+namespace Players {
 
     //The main monobehaviour for each player.
     //This is responsible for all calls to and from the networkmanager, as well as communicating with all components
@@ -12,79 +13,121 @@ namespace Match {
         private Movement movement;
         private WeaponManager weaponManager;
 
+		[SyncVar(hook = "SetCharacter")]
+		public int Character;
+		[SyncVar(hook = "SetHealth")]
+		public float Health;
+
 		public Camera mainCamera;
         public Transform modelRoot; //Change to model manager in future
         public BoxCollider box;
 
         void Awake () {
-            movement = gameObject.AddComponent<Movement> ();
-            weaponManager = gameObject.AddComponent<WeaponManager> ();
+            movement = gameObject.GetComponent<Movement> ();
+            weaponManager = gameObject.GetComponent<WeaponManager> ();
         }
 
-        #region Primary Methods
+		#region Initialization
 
-        //Called OnStartClient
-        public void Initialize () {
-            movement.Initialize (InputManager.DEFAULT_CONTROLLER, mainCamera, modelRoot, box);
-            weaponManager.Initialize ();
+		public override void OnStartClient () {
+			base.OnStartClient ();
+			movement.Initialize (InputManager.DEFAULT_CONTROLLER, mainCamera, modelRoot, box);
+			weaponManager.Initialize ();
+
+			mainCamera.enabled = false;
+		}
+
+		public override void OnStartLocalPlayer ()
+		{
+			base.OnStartLocalPlayer ();
+			mainCamera.enabled = true;
+		}
+
+		[Server]
+        public void ServerInitialize () {
+			Character = -1;
+			Health = 0;
         }
 
-        //Called RpcSetup
-        public void Setup (int index) {
+		#endregion
+	
+		#region Character
+
+		[Command]
+		public void CmdCharacter(int character){
+			Character = character;
+			//Set to health of player
+		}
+
+		//Character hook
+		private void SetCharacter(int character){
+			Debug.Log ("Setting " + playerControllerId + " to " + character);
+			Character = character;
 			movement.Setup (GameData.Character.Default);
-            weaponManager.Setup (index);
-        }
+			weaponManager.Setup (character);
+		}
+
+		#endregion
+
+		#region Spawn
+
+		[Server]
+		public void Spawn (){
+			//Set health to max
+			RpcSpawn(Vector3.zero, 0);
+		}
 			
-		private void Spawn (Vector3 position, float rotation) {
+		[ClientRpc]
+		private void RpcSpawn (Vector3 position, float rotation) {
             movement.Spawn (position, rotation);
             weaponManager.Spawn ();
         }
 
-        private void Die () {
-            movement.Die ();
-            weaponManager.Die ();
-        }
+		[ClientRpc]
+		public void RpcRespawn(float seconds){
+			//SET THE DISPLAYED RESPAWN TIME TO X SECONDS
+		}
 
-        #endregion
+		#endregion
 
-        #region Network Events
+		#region Health
 
-        public override void OnStartClient () {
-            base.OnStartClient ();
-            Initialize ();
+		//Called 
+		[Server]
+		public void TakeDamage(int srcId, float amount, Vector3 hitPosition){
+			Health -= amount;
+			if (Health <= 0) {
+				Die ();
+			}
+		}
 
-			//TEMPORARY
-			Setup (0);
-			Spawn (Vector3.up * 5, 0);
-        }
+		//TODO REMOVE
+		private const float SPAWNTIME = 3;
+
+		[Server]
+		public void Die(){
+			PlayerManager.Respawn (playerControllerId, SPAWNTIME);
+			RpcDie ();
+		}
 
 		[ClientRpc]
-		public void RpcSpawn (Vector3 position, float rotation) {
-			Spawn (position, rotation);
+		private void RpcDie () {
+			movement.Die ();
+			weaponManager.Die ();
 		}
 
-		[ClientRpc]
-		public void RpcDie () {
-			Die ();
+		//Health hook
+		private void SetHealth(float health){
+			Health = health;
+			if (health < 0){
+				//Local Damage thing
+			}
+			if (health > 0){
+				//Local Heal thing
+			}
 		}
 
-        [ClientRpc]
-        public void RpcSetup(int index) {
-            Setup (index);
-        }
-
-        //Invoke to set character
-        [Command]
-        public void CmdSetup(int index) {
-            RpcSetup (index);
-        }
-
-		[Command]
-		public void CmdDamage(float amount){
-			HealthManager.TakeDamage (playerControllerId, amount);
-		}
-
-        #endregion
+		#endregion
     }
 }
 
