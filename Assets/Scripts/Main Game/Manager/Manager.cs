@@ -29,6 +29,9 @@ namespace Match {
 		public override void OnServerAddPlayer (NetworkConnection conn, short playerControllerId)
 		{
 			GameObject g = Instantiate (playerPrefab, Vector3.zero, Quaternion.identity);
+
+			//NOTE: CAN CALL ADDPLAYERFORCONNECTION AFTER FILE TRANSFER
+
 			NetworkServer.AddPlayerForConnection (conn, g, playerControllerId);
 
 			Player p = g.GetComponent<Player> ();

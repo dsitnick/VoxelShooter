@@ -29,6 +29,9 @@ namespace Players {
 
 		#region Initialization
 
+		/// <summary>
+		/// Calls client initialization functions
+		/// </summary>
 		public override void OnStartClient () {
 			base.OnStartClient ();
 			movement.Initialize (InputManager.DEFAULT_CONTROLLER, mainCamera, modelRoot, box);
@@ -37,12 +40,18 @@ namespace Players {
 			mainCamera.enabled = false;
 		}
 
-		public override void OnStartLocalPlayer ()
-		{
+		/// <summary>
+		/// Calls local-only initialization functions
+		/// </summary>
+		public override void OnStartLocalPlayer () {
 			base.OnStartLocalPlayer ();
 			mainCamera.enabled = true;
 		}
 
+		/// <summary>
+		/// Called from Manager OnServerAddPlayer
+		/// Initializes SyncVars
+		/// </summary>
 		[Server]
         public void ServerInitialize () {
 			Character = -1;
@@ -53,15 +62,21 @@ namespace Players {
 	
 		#region Character
 
+		/// <summary>
+		/// Can be invoked locally from UI
+		/// Sets the Character value
+		/// </summary>
 		[Command]
 		public void CmdCharacter(int character){
 			Character = character;
 			//Set to health of player
 		}
 
-		//Character hook
+		/// <summary>
+		/// Character hook
+		/// Calls local Setup functions
+		/// </summary>
 		private void SetCharacter(int character){
-			Debug.Log ("Setting " + playerControllerId + " to " + character);
 			Character = character;
 			movement.Setup (GameData.Character.Default);
 			weaponManager.Setup (character);
@@ -71,18 +86,28 @@ namespace Players {
 
 		#region Spawn
 
+		/// <summary>
+		/// Called from PlayerManager on respawn
+		/// </summary>
 		[Server]
 		public void Spawn (){
 			//Set health to max
 			RpcSpawn(Vector3.zero, 0);
 		}
-			
+
+		/// <summary>
+		/// Called from Spawn
+		/// Positions the player and calls local spawn functions
+		/// </summary>
 		[ClientRpc]
 		private void RpcSpawn (Vector3 position, float rotation) {
             movement.Spawn (position, rotation);
             weaponManager.Spawn ();
         }
 
+		/// <summary>
+		/// Called from PlayerManager at the beginning of respawn
+		/// </summary>
 		[ClientRpc]
 		public void RpcRespawn(float seconds){
 			//SET THE DISPLAYED RESPAWN TIME TO X SECONDS
@@ -92,9 +117,21 @@ namespace Players {
 
 		#region Health
 
-		//Called 
+		/// <summary>
+		/// Called from local weapons
+		/// Deals damage through the player manager
+		/// </summary>
+		[Command]
+		public void CmdDamage(short dest, float amount, Vector3 hitPosition){
+			PlayerManager.DealDamage (dest, playerControllerId, amount, hitPosition);
+		}
+
+		/// <summary>
+		/// Called from PlayerManager
+		/// Sets health and potentially calls Die
+		/// </summary>
 		[Server]
-		public void TakeDamage(int srcId, float amount, Vector3 hitPosition){
+		public void TakeDamage(short srcId, float amount, Vector3 hitPosition){
 			Health -= amount;
 			if (Health <= 0) {
 				Die ();
@@ -104,19 +141,29 @@ namespace Players {
 		//TODO REMOVE
 		private const float SPAWNTIME = 3;
 
+		/// <summary>
+		/// Called from TakeDamage
+		/// Server-side Die functionality
+		/// </summary>
 		[Server]
 		public void Die(){
 			PlayerManager.Respawn (playerControllerId, SPAWNTIME);
 			RpcDie ();
 		}
 
+		/// <summary>
+		/// Calls local Die functions
+		/// </summary>
 		[ClientRpc]
 		private void RpcDie () {
 			movement.Die ();
 			weaponManager.Die ();
 		}
 
-		//Health hook
+		/// <summary>
+		/// Health hook
+		/// Calls local damage/heal functions
+		/// </summary>
 		private void SetHealth(float health){
 			Health = health;
 			if (health < 0){

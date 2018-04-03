@@ -293,7 +293,7 @@ GameObject:
   - component: {fileID: 1417126137}
   - component: {fileID: 1417126136}
   m_Layer: 0
-  m_Name: _OTHER MANAGERS
+  m_Name: _SERVER MANAGERS
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -340,7 +340,7 @@ MonoBehaviour:
     i13: 0
     i14: 0
     i15: 0
-  m_ServerOnly: 0
+  m_ServerOnly: 1
   m_LocalPlayerAuthority: 0
 --- !u!4 &1417126138
 Transform:
