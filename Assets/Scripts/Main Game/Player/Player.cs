@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using Match;
+using GameData;
 
 namespace Players {
 
@@ -70,6 +71,10 @@ namespace Players {
 		public void CmdCharacter(int character){
 			Character = character;
 			//Set to health of player
+
+			List<WeaponData> l = new List<WeaponData> ();
+			l.Add (new SniperWeaponData (new Damage (50), 12, 1, 0.3f, 0, 0, 0, 2));
+			weaponManager.Setup (l);
 		}
 
 		/// <summary>
@@ -78,8 +83,7 @@ namespace Players {
 		/// </summary>
 		private void SetCharacter(int character){
 			Character = character;
-			movement.Setup (GameData.Character.Default);
-			weaponManager.Setup (character);
+			movement.Setup (GameData.CharacterData.Default);
 		}
 
 		#endregion
@@ -122,8 +126,8 @@ namespace Players {
 		/// Deals damage through the player manager
 		/// </summary>
 		[Command]
-		public void CmdDamage(short dest, float amount, Vector3 hitPosition){
-			PlayerManager.DealDamage (dest, playerControllerId, amount, hitPosition);
+		public void CmdDamage(short dest, Damage damage, Vector3 hitPosition){
+			PlayerManager.DealDamage (dest, playerControllerId, damage, hitPosition);
 		}
 
 		/// <summary>
@@ -131,8 +135,8 @@ namespace Players {
 		/// Sets health and potentially calls Die
 		/// </summary>
 		[Server]
-		public void TakeDamage(short srcId, float amount, Vector3 hitPosition){
-			Health -= amount;
+		public void TakeDamage(short srcId, Damage damage, Vector3 hitPosition){
+			Health -= damage.amount;
 			if (Health <= 0) {
 				Die ();
 			}

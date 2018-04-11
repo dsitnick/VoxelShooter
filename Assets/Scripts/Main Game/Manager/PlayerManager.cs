@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using Players;
+using GameData;
 
 namespace Match {
 	public class PlayerManager : NetworkBehaviour {
@@ -46,11 +47,11 @@ namespace Match {
 		/// Called from Player with authority
 		/// Deals damage to the target player
 		/// </summary>
-		public static void DealDamage(short id, short src, float amount, Vector3 hitPosition){
+		public static void DealDamage(short id, short src, Damage damage, Vector3 hitPosition){
 			if (!singleton.playerMap.ContainsKey (id)) {
 				return;
 			}
-			singleton.playerMap [id].TakeDamage (src, amount, hitPosition);
+			singleton.playerMap [id].TakeDamage (src, damage, hitPosition);
 		}
 
 		/// <summary>

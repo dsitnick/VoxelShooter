@@ -29,7 +29,7 @@ namespace Players {
 		void Awake(){
 			rb = GetComponent<Rigidbody> ();
             mask = 1 << LayerMask.NameToLayer ("Map");
-			Setup (Character.Default); //TEMPORARY
+			Setup (CharacterData.Default); //TEMPORARY
 		}
 
 		public void Initialize (Controller controller, Camera mainCamera, Transform modelRoot, BoxCollider box) {
@@ -40,7 +40,7 @@ namespace Players {
 			active = false;
         }
 
-        public void Setup (Character character) {
+        public void Setup (CharacterData character) {
 			speed = character.speed;
 			jumpHeight = character.jumpHeight;
         }
